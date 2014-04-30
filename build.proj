@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build;CopyToReleaseFolder" ToolsVersion="4.0">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build;Test;CopyToReleaseFolder" ToolsVersion="4.0">
   <!--Project configuration-->
   <Import Project="Build.config" />
   
   <UsingTask TaskName="xunit" AssemblyFile="$(XUnitPath)\xunit.runner.msbuild.dll" />
 
   <!--Clean-->
-  <Target Name="CleanAll" DependsOnTargets="CleanDebug;CleanRelease" />
+  <Target Name="CleanAll" DependsOnTargets="CleanDebug;CleanRelease;DeleteReleaseFolder" />
   <Target Name="CleanDebug">
     <MSBuild Projects="@(ProjectToBuild)" Targets="Clean" Properties="Configuration=Debug" />
   </Target>
@@ -16,11 +16,19 @@
 
   <!--Compile-->
   <Target Name="Build" DependsOnTargets="CleanAll;RestorePackages">
-    <MSBuild Projects="@(ProjectToBuild)" Properties="Configuration=Release" />
+    <MSBuild Projects="@(ProjectToBuild)" Properties="Configuration=$(Configuration)" />
   </Target>
 
-  <!--Test. Note that the GetTestAssemblies Task MUST BE defined in the Build.config file. -->
-  <Target Name="Test" DependsOnTargets="GetTestAssemblies">
+  <!--Test-->
+  <Target Name="Test">
+    <ItemGroup>
+      <TestAssemblies Include="**\bin\$(Configuration)\*.Tests.dll" />
+    </ItemGroup>
+    
+    <!-- build if no test assemblies are found -->
+    <CallTargets Targets="Build" Condition="'@(TestAssemblies)'==''" />
+    
+    <Message Text="Running tests on @(TestAssemblies)" />
     <xunit Assemblies="@(TestAssemblies)" />
   </Target>
 
@@ -28,10 +36,8 @@
   <Target Name="DeleteReleaseFolder">
     <RemoveDir Directories="$(ReleaseFolder)" />
   </Target>
-  <Target Name="MakeReleaseFolder" DependsOnTargets="DeleteReleaseFolder">
+  <Target Name="CopyToReleaseFolder" DependsOnTargets="Build;DeleteReleaseFolder">
     <MakeDir Directories="$(ReleaseFolder)" Condition="!Exists($(ReleaseFolder))" />
-  </Target>
-  <Target Name="CopyToReleaseFolder" DependsOnTargets="Test">
     <Copy SourceFiles="@(BuildOutput)" DestinationFolder="$(ReleaseFolder)" />
   </Target>
   
