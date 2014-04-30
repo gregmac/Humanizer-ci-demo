@@ -42,12 +42,8 @@
   </Target>
   
   <!--Nuget restore-->
-  <ItemGroup>
-    <Solution Include="$(MSBuildThisFileDirectory)src\*.sln" />
-  </ItemGroup>
-
   <Target Name="RestorePackages">
-    <Exec Command="&quot;$(MSBuildThisFileDirectory)tools\NuGet\NuGet.exe&quot; restore &quot;%(Solution.Identity)&quot;" />
+    <Exec Command="&quot;$(MSBuildThisFileDirectory)tools\NuGet\NuGet.exe&quot; restore &quot;%(ProjectToBuild.Identity)&quot;" />
   </Target>
 
 </Project>
