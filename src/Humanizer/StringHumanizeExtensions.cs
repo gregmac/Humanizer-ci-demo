@@ -21,8 +21,6 @@ namespace Humanizer
 (?<=[a-z])(?=[A-Z0-9])|
 (?# number to word or acronym)
 (?<=[0-9])(?=[A-Za-z])|
-(?# acronym to number)
-(?<=[A-Z])(?=[0-9])|
 (?# acronym to word)
 (?<=[A-Z])(?=[A-Z][a-z])
 ", RegexOptions.IgnorePatternWhitespace);
