@@ -53,7 +53,7 @@
   
   -->
   <Target Name="Package" DependsOnTargets="Build;CleanReleaseFolder">
-    <Error Condition="'$(Version)'==''" Text="Version property must be supplied to create NuGet package" />
+    <Error Condition="'$(Version)'==''" Text="Version property must be supplied to create NuGet package." />
     <Exec Command="&quot;$(NugetPath)\NuGet.exe&quot; pack &quot;%(NuspecFiles.Identity)&quot; -Version &quot;$(Version)&quot; -OutputDirectory &quot;$(ReleaseFolder)&quot;" />
   </Target>
 
