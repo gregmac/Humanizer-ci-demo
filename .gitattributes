@@ -1,4 +1,4 @@
-* text=auto
+* text eol=crlf
 
 # Custom for Visual Studio
 *.cs     diff=csharp
@@ -60,6 +60,3 @@
 *.PDF  diff=astextplain
 *.rtf  diff=astextplain
 *.RTF  diff=astextplain
-
-# Ensure approval tests are unchanged
-*.approved.txt eol=crlf
