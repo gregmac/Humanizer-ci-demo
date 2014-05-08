@@ -6,7 +6,7 @@
   <UsingTask TaskName="xunit" AssemblyFile="$(XUnitPath)\xunit.runner.msbuild.dll" />
 
   <!--Clean-->
-  <Target Name="CleanAll" DependsOnTargets="CleanDebug;CleanRelease;DeleteReleaseFolder" />
+  <Target Name="CleanAll" DependsOnTargets="CleanDebug;CleanRelease;CleanReleaseFolder" />
   <Target Name="CleanDebug">
     <MSBuild Projects="@(ProjectToBuild)" Targets="Clean" Properties="Configuration=Debug" />
   </Target>
@@ -33,17 +33,28 @@
   </Target>
 
   <!--Release-->
-  <Target Name="DeleteReleaseFolder">
+  <Target Name="CleanReleaseFolder">
     <RemoveDir Directories="$(ReleaseFolder)" />
-  </Target>
-  <Target Name="CopyToReleaseFolder" DependsOnTargets="Build;DeleteReleaseFolder">
     <MakeDir Directories="$(ReleaseFolder)" Condition="!Exists($(ReleaseFolder))" />
+  </Target>
+  <Target Name="CopyToReleaseFolder" DependsOnTargets="Build;CleanReleaseFolder">
     <Copy SourceFiles="@(BuildOutput)" DestinationFolder="$(ReleaseFolder)" />
   </Target>
   
   <!--Nuget restore-->
   <Target Name="RestorePackages">
-    <Exec Command="&quot;$(MSBuildThisFileDirectory)tools\NuGet\NuGet.exe&quot; restore &quot;%(ProjectToBuild.Identity)&quot;" />
+    <Exec Command="&quot;$(NugetPath)\NuGet.exe&quot; restore &quot;%(ProjectToBuild.Identity)&quot;" />
+  </Target>
+  
+  <!--Nuget package.
+  
+  Must specify a Version property when using this!
+  
+  
+  -->
+  <Target Name="Package" DependsOnTargets="Build;CleanReleaseFolder">
+    <Error Condition="'$(Version)'==''" Text="Version property must be supplied to create NuGet package" />
+    <Exec Command="&quot;$(NugetPath)\NuGet.exe&quot; pack &quot;%(NuspecFiles.Identity)&quot; -Version &quot;$(Version)&quot; -OutputDirectory &quot;$(ReleaseFolder)&quot;" />
   </Target>
 
 </Project>
